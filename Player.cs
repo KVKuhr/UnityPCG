@@ -102,7 +102,7 @@ public class Player : MonoBehaviour
 	private void HandleInput ()
 	{
 		//When the Jump Axis is beeing pressed during update.
-		if (Input.GetAxis ("Jump") == 1) {
+		if (Input.GetAxis ("Jump") == 1 && isGrounded) {
 			isJumping = true;		
 		}
 		//When the Fire1 Axis is beeing pressed during update.
@@ -154,6 +154,7 @@ public class Player : MonoBehaviour
 		if (otherTag.Equals ("Finish"))
 			Finish (false);
 	}
+
 	//Called by On Triger enter in case of EnemyProjectile Hit.
 	private void OnHit (Vector2 relativePos)
 	{
@@ -171,19 +172,18 @@ public class Player : MonoBehaviour
 			Finish (true);
 
 	}
-
 	//Called when the level is reloaded / the next one is loaded.
 	private void Finish (bool reset)
 	{
 		if (reset)
 			Application.LoadLevel (Application.loadedLevel);
 		else {
+			if(Application.loadedLevelName.Equals("ac"))
+				Application.LoadLevel("ac");
 			if(Application.loadedLevelName.Equals("aa"))
 				Application.LoadLevel("ab");
 			else
-				Application.LoadLevel("aa");
-
-		
+				Application.LoadLevel("aa");		
 		}
 
 

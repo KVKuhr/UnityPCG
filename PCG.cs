@@ -46,14 +46,32 @@ public class PCG : MonoBehaviour
 		finish;
 	//End of Generator V3.
 
+	private ArrayList toVisit = new ArrayList ();
+	private ArrayList visited = new ArrayList ();
+
+
+
+
+
 	//Auxiliary, for easier testing.
 	private float cooldown = 1;
 
 	void Start ()
-	{	//Calls the function that oversees terrain creation. Generator V2.
+	{	
+		//Calls the function that oversees terrain creation. Generator V2.
 		createTerrain ();
+		
+		createEntities (true);
+		
+		makeUsable ();
 
-		createEntities ();
+	}
+	void reset(){
+		Application.LoadLevel (Application.loadedLevel);
+
+
+	
+	
 	}
 
 	//Start of V2.
@@ -147,11 +165,13 @@ public class PCG : MonoBehaviour
 	//Start of V3
 
 	//Sets the location of the player, enemies and finish.
-	private void createEntities ()
+	private void createEntities (bool notReset)
 	{
 		placePlayer ();	
-		placeEnemies ();
 		placeFinish ();	
+		if(notReset)
+		placeEnemies ();
+
 	}
 
 	//Places the Player in a suitable spot on the map.
@@ -177,15 +197,15 @@ public class PCG : MonoBehaviour
 		
 		int[] pos = findSuitable ();
 		Vector2 finalPos = new Vector2 (pos [0], pos [1]);
-		if (Vector2.Distance (finalPos, player.transform.position) < 1000){
+		if (Vector2.Distance (finalPos, player.transform.position) < 1000) {
 			while (Vector2.Distance(finalPos,playerPos)< 100) {
 				pos = findSuitable ();
 				finalPos = new Vector2 (pos [0], pos [1]);
 			}
 
-			}
+		}
 
-		Instantiate (finish, finalPos, Quaternion.identity);
+		finish = Instantiate (finish, finalPos, Quaternion.identity) as GameObject;
 	}
 
 	//Finds a SUITABLE LOCATION for the PLAYER and the FINISH.
@@ -240,11 +260,141 @@ public class PCG : MonoBehaviour
 		return returning;
 	}
 
+	private void clearPlayerFinish(){
+		Destroy (player);
+		Destroy (finish);
+	}
+
+
 
 	//End of V3
 
+	//Start of V4
+	private void makeUsable ()
+	{
+		bool isUsable = true;
+		while (isUsable) {
+			if(!startDijkstra ()){
+				Debug.Log("nope");
+				reset()	;			
+			}
+			else
+				isUsable = false;
+			isUsable = false;
+		}
+
+	}
+
+	private bool startDijkstra ()
+	{
+
+
+		toVisit.Add (new Vector2 (player.transform.position.x, player.transform.position.y));
+
+	
+		while (toVisit.Count>0) {
+
+			Vector2 aux = (Vector2)toVisit [findClosest ()];
+			if (fillAdjacent (aux)) {
+				toVisit.Clear ();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private bool fillAdjacent (Vector2 current)
+	{
+		visited.Add (current);
+		toVisit.Remove (current);
+
+		if (isFinish (current))
+			return true;
+
+		Vector2 aux = new Vector2 (current.x + 10, current.y);
+
+		if (ifHelper (aux))
+			return true;
+
+		aux = new Vector2 (current.x, current.y + 10);
+		if (ifHelper (aux))
+			return true;
+
+		aux = new Vector2 (current.x - 10, current.y);
+		if (ifHelper (aux))
+			return true;
+
+		aux = new Vector2 (current.x, current.y - 10);
+		if (ifHelper (aux))
+			return true;
+
+		return false;
+
+	}
+
+	private int findClosest ()
+	{
+		int returned = 0;
+		float aux = Mathf.Infinity;
+		Vector2 finishpoint = new Vector2 (finish.transform.position.x, finish.transform.position.y);
+		for (int i = 0; i<toVisit.Count; i++) {
+			if (Vector2.Distance ((Vector2)toVisit [i], finishpoint) < aux) {
+				returned = i;
+				aux = Vector2.Distance ((Vector2)toVisit [i], finishpoint);
+			}
+		}
+		return returned;	
+	}
+
+	private bool ifHelper (Vector2 aux)
+	{
+		if (isEmpty (aux) && ! visited.Contains (aux) && !toVisit.Contains (aux) || isFinish (aux)) {
+			if (isFinish (aux))
+				return true;
+			toVisit.Add (aux);
+		}
+		return false;
+	}
+
+	private bool isFinish (Vector2 current)
+	{
+		RaycastHit2D hit = Physics2D.Raycast (current, Vector2.right, 5f);
+
+		if (isEmpty (current))
+			return false;
+
+		if (hit.collider.tag.Equals ("Finish"))
+			return true;
+
+		return false;
+
+	}
+
+
+
+	private bool isEmpty (Vector2 current)
+	{
+		RaycastHit2D hit = Physics2D.Raycast (current, Vector2.right, 5f);
+		if (hit.collider == null)
+			return true;
+		hit = Physics2D.Raycast (current, Vector2.left, 5f);
+		if (hit.collider == null)
+			return true;
+		return false;		
+	}
+
+	//End of V4
+	
 	void FixedUpdate ()
 	{
+		
+		
+		
+		Vector3 newPos = new Vector3(player.transform.position.x,player.transform.position.y,transform.position.z);
+		transform.position = Vector3.Lerp (transform.position, newPos, Time.deltaTime *100);
+
+
+
 		cooldown -= 0.02f;
 		HandleInput ();
 	}
@@ -253,10 +403,11 @@ public class PCG : MonoBehaviour
 	{
 		if (Input.GetAxis ("Fire2") == 1)
 		if (cooldown < 0)
-			Application.LoadLevel (Application.loadedLevel);
+			reset ();
 	}
 
 
+	
 
 
 

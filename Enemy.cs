@@ -28,6 +28,8 @@ public class Enemy : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		player = GameObject.FindWithTag ("Player");
+
 		cooldown = aSpeed;
 		rigid = GetComponent<Rigidbody2D> ();
 	}
