@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CameraControl : MonoBehaviour {
 
-
+	[SerializeField]
 	private GameObject target;
 	[SerializeField]
 	private float speed;
