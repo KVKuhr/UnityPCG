@@ -7,10 +7,9 @@ using System.IO;
 public static class SaveLoad {
 	
 	public static List<Level> savedLevels = new List<Level>();
-	
+
 	//it's static so we can call it from anywhere
-	public static void Save(Level current) {
-		SaveLoad.savedLevels.Add(current);
+	public static void Save() {
 		BinaryFormatter bf = new BinaryFormatter();
 		//Application.persistentDataPath is a string, so if you wanted you can put that into debug.log if you want to know where save games are located
 		FileStream file = File.Create (Application.persistentDataPath + "/savedLevels.gd"); //you can call it anything you want
@@ -26,4 +25,7 @@ public static class SaveLoad {
 			file.Close();
 		}
 	}
+
+
+
 }

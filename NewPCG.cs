@@ -32,7 +32,7 @@ public class NewPCG : MonoBehaviour
 	//Start of Generator V3.
 	[SerializeField]
 	private GameObject
-		player;
+		playerPrefab;
 	[SerializeField]
 	private GameObject
 		enemy;
@@ -44,7 +44,13 @@ public class NewPCG : MonoBehaviour
 		numberOfEnemies;
 	[SerializeField]
 	private GameObject
-		finish;
+		finishPrefab;
+
+	private GameObject player;
+
+	private GameObject finish;
+
+
 	//End of Generator V3.
 	
 	private ArrayList toVisit = new ArrayList ();
@@ -63,14 +69,24 @@ public class NewPCG : MonoBehaviour
 	
 	void Start ()
 	{	
+		createLevel ();
+		
+	}
+
+	private void createLevel(){
 		//Calls the function that oversees terrain creation. Generator V2.
 		createTerrain ();
 		
 		createEntities (true);
 		
 		makeUsable ();
-		
+	
+	
 	}
+
+
+
+
 	
 	void reset ()
 	{
@@ -180,7 +196,7 @@ public class NewPCG : MonoBehaviour
 	private void placePlayer ()
 	{
 		int[] pos = findSuitable (currentLevel.getPlayerPos());
-		player = Instantiate (player, new Vector3 (pos [0], pos [1], 0), Quaternion.identity) as GameObject;	
+		player = Instantiate (playerPrefab, new Vector3 (pos [0], pos [1], 0), Quaternion.identity) as GameObject;	
 	}
 	
 	private void placeEnemies ()
@@ -199,7 +215,7 @@ public class NewPCG : MonoBehaviour
 
 		int[] pos = findSuitable (currentLevel.getFinishPos());
 		Vector2 finalPos = new Vector2 (pos [0], pos [1]);		
-		finish = Instantiate (finish, finalPos, Quaternion.identity) as GameObject;
+		finish = Instantiate (finishPrefab, finalPos, Quaternion.identity) as GameObject;
 	}
 	
 	//Finds a SUITABLE LOCATION for the PLAYER and the FINISH.
@@ -239,11 +255,36 @@ public class NewPCG : MonoBehaviour
 	{
 		Destroy (player);
 		Destroy (finish);
+
+	}
+	private void clearEnemies(){
+		GameObject[] enemies = GameObject.FindGameObjectsWithTag ("Enemy");
+
+		for (int i = 0; i<enemies.Length; i++) {
+			Destroy(enemies[i]);			
+		}	
 	}
 	
-	
+
+
+
+
+
+
 	
 	//End of V3
+	private void remakePositions(){
+		clearPlayerFinish ();
+		clearEnemies ();
+		createEntities (true);	
+	}
+
+
+
+
+
+
+
 	
 	//Start of V4
 	private void makeUsable ()
@@ -251,8 +292,8 @@ public class NewPCG : MonoBehaviour
 		bool isUsable = true;
 		while (isUsable) {
 			if (!startDijkstra ()) {
-				Debug.Log ("nope");
-				reset ();			
+				Debug.Log("rmk");
+				remakePositions();			
 			} else
 				isUsable = false;
 			isUsable = false;
@@ -383,8 +424,8 @@ public class NewPCG : MonoBehaviour
 	{
 		Level chosen = new Level ();
 		ArrayList lp = new ArrayList ();		
-		ArrayList lc = new ArrayList ();
-		ArrayList le = new ArrayList ();
+		ArrayList cp = new ArrayList ();
+		ArrayList ep = new ArrayList ();
 
 
 		for(int i = 0; i<30;i++){
@@ -394,24 +435,62 @@ public class NewPCG : MonoBehaviour
 
 			randomBlock = getRandomBlock();
 			int[] aux1 = {randomBlock[0],randomBlock[1],15};
-			lc.Add(aux1);
+			cp.Add(aux1);
 
 			randomBlock = getRandomBlock();
 			if(i%3==0){
 				int[] aux2 = {randomBlock[0],randomBlock[1]};
-				le.Add(aux2);
+				ep.Add(aux2);
 			
 			}
 
 
 		}
 		chosen.setPositions (getRandomBlock(),getRandomBlock());
-		chosen.setEnemies (le);
+		chosen.setEnemies (ep);
 
-		chosen.setLines (lp,lc);
+		chosen.setLines (lp,cp);
 
 		currentLevel = chosen;
 
+	}
+
+	//TODO
+	private void createSeed ()
+	{
+		Level chosen = new Level ();
+		ArrayList lp = new ArrayList ();		
+		ArrayList lc = new ArrayList ();
+		ArrayList le = new ArrayList ();
+		
+		
+		for (int i = 0; i<30; i++) {
+			int[] randomBlock = getRandomBlock ();
+			int wallsize = (int)Random.Range (10, 40);
+
+			int[] aux = {randomBlock [0],randomBlock [1],wallsize};
+			lp.Add (aux);
+
+			wallsize = (int)Random.Range (10, 30);
+			randomBlock = getRandomBlock ();
+			int[] aux1 = {randomBlock [0],randomBlock [1],wallsize};
+			lc.Add (aux1);
+			
+			randomBlock = getRandomBlock ();
+			if (i % 3 == 0) {
+				int[] aux2 = {randomBlock [0],randomBlock [1]};
+				le.Add (aux2);
+				
+			}
+			
+			
+		}
+		chosen.setPositions (getRandomBlock (), getRandomBlock ());
+		chosen.setEnemies (le);
+		
+		chosen.setLines (lp, lc);
+		
+		currentLevel = chosen;
 	}
 
 
@@ -535,7 +614,6 @@ public class NewPCG : MonoBehaviour
 					return returning;
 				break;
 			}
-			Debug.Log(returning);
 		
 			counter++;
 		}
@@ -549,9 +627,29 @@ public class NewPCG : MonoBehaviour
 	
 	
 	//End of V5
+
+	//Creation of List
+	public Level[] createNewList(){
+		int size = 5;
+
+		Level[] returning = new Level[size];
+
+		for (int i = 0; i<size; i++) {
+			returning[i]=createAndTest();			
+		}
+
+		return returning;	
+	}
 	
-	
-	
+	private Level createAndTest(){
+		createLevel ();
+		Level returning = currentLevel;
+		currentLevel = null;
+		return returning;
+
+	}
+
+
 	
 	
 	

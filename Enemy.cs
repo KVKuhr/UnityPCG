@@ -47,6 +47,10 @@ public class Enemy : MonoBehaviour {
 	}
 
 	private void attackPlayer() {
+		if(player == null)
+			player = GameObject.FindWithTag ("Player");
+
+
 		Vector3 aux = player.transform.position;
 		Vector2 relativePos = aux - transform.position;
 		Quaternion rotation = Quaternion.LookRotation (relativePos);

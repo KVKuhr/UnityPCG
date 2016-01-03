@@ -56,7 +56,11 @@ public class Player : MonoBehaviour
 		myAnimator = GetComponent<Animator> ();
 		cooldown = aSpeed;
 		gui = GameObject.FindWithTag ("UI").GetComponent<CustomUI>();
-		gui.startUp (hp);
+		if (gui != null) {
+			gui.startUp (hp);
+		}else
+			Debug.Log ("UI not Found");
+	
 	}
 
 	void FixedUpdate ()
@@ -103,6 +107,10 @@ public class Player : MonoBehaviour
 	//Called by FixedUpdate
 	private void HandleInput ()
 	{
+		if (Input.GetAxis ("Cancel") == 1) {		
+			gui.escPressed();
+		}
+
 		//When the Jump Axis is beeing pressed during update.
 		if (Input.GetAxis ("Jump") == 1 && isGrounded) {
 			isJumping = true;		
@@ -112,6 +120,8 @@ public class Player : MonoBehaviour
 			handleAttack ();
 			cooldown = aSpeed;
 		}
+
+
 	
 	}
 
@@ -187,10 +197,8 @@ public class Player : MonoBehaviour
 			else
 				Application.LoadLevel("aa");		
 		}
-
-
 	}
-		
+
 }
 
 

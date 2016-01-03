@@ -43,4 +43,7 @@ public class MenuScript : MonoBehaviour {
 		Application.LoadLevel (1);
 	}
 
+	public void startPCGSeed(){
+		Application.LoadLevel ("ad");
+	}
 }

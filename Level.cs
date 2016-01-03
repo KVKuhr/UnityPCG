@@ -10,6 +10,7 @@ public class Level
 	private ArrayList enemyPos = new ArrayList ();
 	private int[] playerPos = new int[2];
 	private int[] finishPos= new int[2];
+	private float score = 0;
 
 	public Level(){
 	}
@@ -42,7 +43,15 @@ public class Level
 	public void setEnemies(ArrayList eL){
 		enemyPos = eL;
 	}
-
+	public void positiveEvaluation(){
+		score++;
+	}
+	public void negativeEvaluation(){
+		score--;
+	}
+	public float getScore(){
+		return score;
+	}
 
 
 
