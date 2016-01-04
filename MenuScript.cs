@@ -9,6 +9,10 @@ public class MenuScript : MonoBehaviour {
 	private Button startButton;
 	[SerializeField]
 	private Button exitButton;
+	[SerializeField]
+	private GameObject controlHolder;
+
+	private PCGControler control;
 
 	// Use this for initialization
 	void Start () {
@@ -16,6 +20,7 @@ public class MenuScript : MonoBehaviour {
 		startButton = startButton.GetComponent<Button>();
 		exitButton = exitButton.GetComponent<Button>();
 		quitMenu.enabled = false;
+		control = controlHolder.GetComponent<PCGControler>();
 	}
 	
 	public void exitPress(){
@@ -35,15 +40,15 @@ public class MenuScript : MonoBehaviour {
 	}
 
 	public void startPCGLevel(){
-		Application.LoadLevel ("ac");
+		control.startPCGLevel ();
 	
 	}
 
 	public void StartLevel(){
-		Application.LoadLevel (1);
+		control.startLevel();
 	}
 
 	public void startPCGSeed(){
-		Application.LoadLevel ("ad");
+		control.startPCGSeed ();
 	}
 }

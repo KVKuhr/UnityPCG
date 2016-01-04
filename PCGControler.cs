@@ -5,10 +5,8 @@ using System.Collections.Generic;
 public class PCGControler : MonoBehaviour
 {
 
-	[SerializeField]
-	private GameObject
-		PCGHolder;
-	private NewPCG pcg;
+
+	private PCGLevelMaker pcg;
 	private List<Level> levelList;
 	public static Level sentLevel;
 
@@ -16,7 +14,7 @@ public class PCGControler : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		pcg = PCGHolder.GetComponent<NewPCG> ();
+		pcg = gameObject.GetComponent<PCGLevelMaker> ();
 
 	}
 
@@ -67,71 +65,19 @@ public class PCGControler : MonoBehaviour
 		
 	}
 	
-	public void StartLevel ()
+	public void startLevel ()
 	{
 		Application.LoadLevel ("aa");
 	}
 	
 	public void startPCGSeed ()
 	{
+		SaveLoad.Load ();
+		levelList = SaveLoad.savedLevels;
+		Debug.Log (levelList.Count+" start");
+		int l = getHighestRated();
+		sentLevel = levelList[l];
 		Application.LoadLevel ("ad");
-	}
-
-	//TODO
-	private void composeLevel ()
-	{
-		ArrayList lp = new ArrayList ();		
-		ArrayList lc = new ArrayList ();
-		ArrayList le = new ArrayList ();
-		int bestPos = getHighestRated ();
-		int pairPos = (int)Random.Range (0, levelList.Count - 1);
-		Level best = levelList [bestPos];
-		while (pairPos == bestPos)
-			pairPos = (int)Random.Range (0, levelList.Count - 1);
-		Level pair = levelList [pairPos];
-		int[] playerPos;
-		int[] endPos;
-
-
-
-		for (int i = 0; i<30; i++) {
-			if (getFromBest ())
-				lp.Add (best.getLine () [i]);
-			else
-				lp.Add (pair.getLine () [i]);
-		
-			if (getFromBest ())
-				lc.Add (best.getCollum () [i]);
-			else
-				lc.Add (pair.getCollum () [i]);
-		
-			if(i%3==0){
-
-				if (getFromBest ())
-					le.Add (best.getEnemies () [i]);
-				else
-					le.Add (pair.getEnemies () [i]);
-			}
-		}
-		Level newLevel = new Level ();
-
-		newLevel.setLines (lp,lc);
-		newLevel.setEnemies (le);
-
-		if (getFromBest ())
-			playerPos = best.getPlayerPos ();
-		else
-			playerPos = pair.getPlayerPos ();
-
-		if (getFromBest ())
-			endPos = best.getFinishPos ();
-		else
-			endPos = pair.getFinishPos ();
-
-		newLevel.setPositions (playerPos,endPos);
-
-		sentLevel = newLevel;
-
 	}
 
 	private void lowerAll ()
@@ -144,6 +90,15 @@ public class PCGControler : MonoBehaviour
 	{
 		return Random.value > 0.3;
 	}
+
+	public void makeList(){
+		levelList = pcg.createNewList ();
+		Debug.Log (levelList.Count);
+		SaveLoad.savedLevels = levelList;
+		SaveLoad.Save ();
+	}
+
+
 
 
 

@@ -46,6 +46,8 @@ public class Player : MonoBehaviour
 	private GameObject
 		shield;
 
+
+
 	private CustomUI gui;
 
 
@@ -55,7 +57,13 @@ public class Player : MonoBehaviour
 		rigid = GetComponent<Rigidbody2D> ();
 		myAnimator = GetComponent<Animator> ();
 		cooldown = aSpeed;
-		gui = GameObject.FindWithTag ("UI").GetComponent<CustomUI>();
+
+
+		GameObject holder = GameObject.FindWithTag ("UI");
+
+		if(holder != null)
+		gui = holder.GetComponent<CustomUI>();
+
 		if (gui != null) {
 			gui.startUp (hp);
 		}else
@@ -188,6 +196,8 @@ public class Player : MonoBehaviour
 	//Called when the level is reloaded / the next one is loaded.
 	private void Finish (bool reset)
 	{
+		/*
+
 	
 		if (reset || Application.loadedLevelName.Equals("ac"))
 			Application.LoadLevel (Application.loadedLevel);
@@ -196,7 +206,7 @@ public class Player : MonoBehaviour
 				Application.LoadLevel("ab");
 			else
 				Application.LoadLevel("aa");		
-		}
+		}*/
 	}
 
 }

@@ -37,7 +37,7 @@ public class CustomUI : MonoBehaviour {
 
 	public void exitPress(){
 
-		Application.LoadLevel (0);
+		Application.LoadLevel ("menu");
 	}
 
 	public void openPause(){
