@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using System.Collections.Generic;
 
 public class NewPCG : MonoBehaviour
 {
@@ -163,7 +163,7 @@ public class NewPCG : MonoBehaviour
 	//Oversees the creation of HORIZONTAL walls.
 	private void createHorizontal ()
 	{
-		ArrayList lineStarts = currentLevel.getLine ();
+		List<int[]> lineStarts = currentLevel.getLine ();
 		for (int h = 0; h<lineStarts.Count; h++) {
 
 			int [] aux = (int[])lineStarts[h]; 
@@ -174,7 +174,7 @@ public class NewPCG : MonoBehaviour
 	//Oversees the creation of VERTICAL walls.
 	private void createVertical ()
 	{
-		ArrayList verticalStarts = currentLevel.getCollum();
+		List<int[]> verticalStarts = currentLevel.getCollum();
 		for (int v = 0; v<verticalStarts.Count; v++) {
 
 			int [] aux = (int[]) verticalStarts[v]; 
@@ -204,7 +204,7 @@ public class NewPCG : MonoBehaviour
 	
 	private void placeEnemies ()
 	{
-		ArrayList aux = currentLevel.getEnemies ();
+		List<int[]> aux = currentLevel.getEnemies ();
 
 
 		for (int i = 0; i<aux.Count; i++) {

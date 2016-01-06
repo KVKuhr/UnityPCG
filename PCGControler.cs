@@ -14,6 +14,15 @@ public class PCGControler : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		GameObject.DontDestroyOnLoad (gameObject);
+
+		if (FindObjectsOfType (GetType ()).Length > 1) {
+			Destroy (gameObject);
+		}
+
+
+
+
 		pcg = gameObject.GetComponent<PCGLevelMaker> ();
 
 	}
@@ -74,9 +83,10 @@ public class PCGControler : MonoBehaviour
 	{
 		SaveLoad.Load ();
 		levelList = SaveLoad.savedLevels;
-		Debug.Log (levelList.Count+" start");
-		int l = getHighestRated();
-		sentLevel = levelList[l];
+
+		int l = getHighestRated ();
+
+		sentLevel = levelList [l];
 		Application.LoadLevel ("ad");
 	}
 
@@ -86,16 +96,36 @@ public class PCGControler : MonoBehaviour
 			l.negativeEvaluation ();		
 	}
 
-	private bool getFromBest ()
+	//TODO
+	private void generateNew ()
 	{
-		return Random.value > 0.3;
+
+	
 	}
 
-	public void makeList(){
-		levelList = pcg.createNewList ();
+
+	public void makeList ()
+	{
+		levelList = pcg.createNewList (5);
 		Debug.Log (levelList.Count);
 		SaveLoad.savedLevels = levelList;
 		SaveLoad.Save ();
+	}
+
+	public void likeLevel ()
+	{
+		sentLevel.positiveEvaluation ();
+		saveLevel ();
+
+	
+	}
+
+	private int getOther(int n){
+		while(true){
+			int i = Mathf.FloorToInt(Random.Range(0,levelList.Count-1));
+			if(i!=n)
+				return i;
+		}
 	}
 
 

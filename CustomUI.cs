@@ -10,13 +10,23 @@ public class CustomUI : MonoBehaviour {
 	[SerializeField]
 	private Canvas pauseMenu;
 
+	[SerializeField]
+	private Canvas evaluateCanvas;
+
+
 
 	private int maxHealth;
 	private int currentHealth;
 
+	private PCGControler control;
+
+
+
+
 
 	public void startUp(int max ){
 
+		control = GameObject.FindGameObjectWithTag ("ControlHolder").GetComponent<PCGControler>();
 
 		pauseMenu.enabled = false;
 		maxHealth = max;
@@ -36,7 +46,7 @@ public class CustomUI : MonoBehaviour {
 	}
 
 	public void exitPress(){
-
+		Time.timeScale = 1.0f;
 		Application.LoadLevel ("menu");
 	}
 
@@ -58,6 +68,18 @@ public class CustomUI : MonoBehaviour {
 			else
 				openPause();
 	}
+
+	public void dislikeLevel(){
+
+
+	}
+
+	public void likeLevel(){
+
+
+
+	}
+
 
 
 

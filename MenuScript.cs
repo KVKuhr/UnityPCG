@@ -16,11 +16,12 @@ public class MenuScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		control = controlHolder.GetComponent<PCGControler>();
 		quitMenu = quitMenu.GetComponent<Canvas>();
 		startButton = startButton.GetComponent<Button>();
 		exitButton = exitButton.GetComponent<Button>();
 		quitMenu.enabled = false;
-		control = controlHolder.GetComponent<PCGControler>();
+
 	}
 	
 	public void exitPress(){

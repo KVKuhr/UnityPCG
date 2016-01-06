@@ -59,8 +59,6 @@ public class PCGLevelMaker : MonoBehaviour
 		
 	//Level for Loading
 	private Level currentLevel;
-
-
 		
 	private void createLevel ()
 	{
@@ -80,7 +78,8 @@ public class PCGLevelMaker : MonoBehaviour
 	//Creates the Terrain for the Level. Generator V2.
 	private void createTerrain ()
 	{
-		createSeed ();
+		if (currentLevel == null)
+			createSeed ();
 			
 		//Calls the function to fill the outer walls.
 		createOuterBounds ();
@@ -131,18 +130,29 @@ public class PCGLevelMaker : MonoBehaviour
 	}
 		
 	//Finds a random point in the pseudomatrix.
-	private int[] getRandomBlock ()
+	public int[] getRandomBlock ()
 	{
 		int[] returning = {0,0};
 		returning [0] = (int)Random.Range (1, matrixSize - 2);
 		returning [1] = (int)Random.Range (1, matrixSize - 2);	
 		return returning;
 	}
+
+	public int[] getRandomBlockStart ()
+	{
+
+		int[] returning = {0,0,0};
+		returning [0] = (int)Random.Range (1, matrixSize - 2);
+		returning [1] = (int)Random.Range (1, matrixSize - 2);
+		returning [2] = (int)Random.Range (wallMinSize, wallMaxSize);
+
+		return returning;
+	}
 		
 	//Oversees the creation of HORIZONTAL walls.
 	private void createHorizontal ()
 	{
-		ArrayList lineStarts = currentLevel.getLine ();
+		List<int[]> lineStarts = currentLevel.getLine ();
 		for (int h = 0; h<lineStarts.Count; h++) {
 				
 			int [] aux = (int[])lineStarts [h]; 
@@ -153,7 +163,7 @@ public class PCGLevelMaker : MonoBehaviour
 	//Oversees the creation of VERTICAL walls.
 	private void createVertical ()
 	{
-		ArrayList verticalStarts = currentLevel.getCollum ();
+		List<int[]> verticalStarts = currentLevel.getCollum ();
 		for (int v = 0; v<verticalStarts.Count; v++) {
 				
 			int [] aux = (int[])verticalStarts [v]; 
@@ -183,7 +193,7 @@ public class PCGLevelMaker : MonoBehaviour
 		
 	private void placeEnemies ()
 	{
-		ArrayList aux = currentLevel.getEnemies ();
+		List<int[]> aux = currentLevel.getEnemies ();
 			
 			
 		for (int i = 0; i<aux.Count; i++) {
@@ -238,8 +248,8 @@ public class PCGLevelMaker : MonoBehaviour
 		Destroy (finish);
 		player = null;
 		finish = null;
-		Destroy (GameObject.FindGameObjectWithTag("Player"));
-		Destroy (GameObject.FindGameObjectWithTag("Finish"));
+		Destroy (GameObject.FindGameObjectWithTag ("Player"));
+		Destroy (GameObject.FindGameObjectWithTag ("Finish"));
 
 			
 	}
@@ -307,9 +317,9 @@ public class PCGLevelMaker : MonoBehaviour
 		while (isUsable) {
 			if (!startDijkstra ()) {
 				counter++;
-				if(counter <10)					
-				remakePositions ();
-				else{
+				if (counter < 10)					
+					remakePositions ();
+				else {
 					return false;
 				}
 			} else
@@ -436,9 +446,9 @@ public class PCGLevelMaker : MonoBehaviour
 	private void createSeed ()
 	{
 		Level chosen = new Level ();
-		ArrayList lp = new ArrayList ();		
-		ArrayList lc = new ArrayList ();
-		ArrayList le = new ArrayList ();			
+		List<int[]> lp = new List<int[]> ();		
+		List<int[]> lc = new List<int[]> ();
+		List<int[]> le = new List<int[]> ();			
 
 		for (int i = 0; i<horizontalWalls; i++) {
 		
@@ -465,8 +475,8 @@ public class PCGLevelMaker : MonoBehaviour
 
 			int[] randomBlock = getRandomBlock ();
 
-				int[] aux2 = {randomBlock [0],randomBlock [1]};
-				le.Add (aux2);
+			int[] aux2 = {randomBlock [0],randomBlock [1]};
+			le.Add (aux2);
 		}
 
 		chosen.setPositions (getRandomBlock (), getRandomBlock ());
@@ -583,14 +593,13 @@ public class PCGLevelMaker : MonoBehaviour
 	//End of V5
 		
 	//Creation of List
-	public List<Level> createNewList ()
+	public List<Level> createNewList (int size)
 	{
-		int size = 1;
-			
-		List<Level> returning = new  List<Level>();
+					
+		List<Level> returning = new  List<Level> ();
 			
 		for (int i = 0; i<size; i++) {
-			returning.Add(createAndTest ());			
+			returning.Add (createAndTest ());			
 		}
 			
 		return returning;	
@@ -605,4 +614,135 @@ public class PCGLevelMaker : MonoBehaviour
 		return returning;
 			
 	}
+
+	public Level createNew (Level best, Level pair)
+	{
+		
+		Level next = new Level ();
+		List<int[]> lp = new List<int[]> ();		
+		List<int[]> lc = new List<int[]> ();
+		List<int[]> le = new List<int[]> ();			
+		int[] pPos;
+		int[] fPos;
+
+
+
+		int bestLineNumber = Mathf.FloorToInt(horizontalWalls * 0.7f);
+		int pairLineNumber = Mathf.FloorToInt(horizontalWalls * 0.2f);
+		int randomLineNumber = Mathf.FloorToInt(horizontalWalls * 0.1f);
+
+		lp.AddRange (getNPositions (best.getLine (), bestLineNumber));
+		lp.AddRange (getNPositions (pair.getLine (), pairLineNumber));
+		lp.AddRange (getNPositonsRandom(randomLineNumber,true));
+
+
+
+		int bestColumnNumber = Mathf.FloorToInt(verticalWalls * 0.7f);
+		int pairColumnNumber = Mathf.FloorToInt(verticalWalls * 0.2f);
+		int randomColumnNumber = Mathf.FloorToInt(verticalWalls * 0.1f);
+		
+		lc.AddRange (getNPositions (best.getCollum (), bestColumnNumber));
+		lc.AddRange (getNPositions (pair.getCollum (), pairColumnNumber));
+		lc.AddRange (getNPositonsRandom(randomColumnNumber,true));
+
+		int bestEnemiesNumber = Mathf.FloorToInt(verticalWalls * 0.7f);
+		int pairEnemiesNumber = Mathf.FloorToInt(verticalWalls * 0.2f);
+		int randomEnemiesNumber = Mathf.FloorToInt(verticalWalls * 0.1f);
+		
+		le.AddRange (getNPositions (best.getEnemies (), bestEnemiesNumber));
+		le.AddRange (getNPositions (pair.getEnemies (), pairEnemiesNumber));
+		le.AddRange (getNPositonsRandom(randomEnemiesNumber,false));
+
+
+
+
+
+
+		if (getFromBest ()) {			 
+			pPos = best.getPlayerPos ();	
+		} else
+		if (getFromPair ()) {
+			pPos = pair.getPlayerPos ();
+		} else
+			pPos = getRandomBlock ();
+
+		if (getFromBest ()) {
+			fPos = best.getFinishPos ();
+		} else
+		if (getFromPair ()) {
+			fPos = pair.getFinishPos ();
+		} else
+			fPos = getRandomBlock ();
+
+
+		
+		next.setPositions (pPos, fPos);
+		
+		next.setEnemies (le);
+		
+		next.setLines (lp, lc);
+		
+		currentLevel = next;
+
+		return createAndTest ();
+
+	}
+
+	private List<int[]> getNPositions (List<int[]> list, int n)
+	{
+	
+		List<int[]> ret = new List<int[]> ();
+
+		for (int i = 0; i<n; i++) {
+			int num = (int)Random.Range (0, list.Count);
+
+			int[] aux = list [num];
+
+			if (ret.Contains (aux))
+				i--;
+			else
+				ret.Add (aux);
+		}
+		return ret;	
+	}
+
+	// IF b, int[3], else int[2]
+	private List<int[]> getNPositonsRandom (int n, bool b)
+	{
+		
+		List<int[]> ret = new List<int[]> ();
+		
+		for (int i = 0; i<n; i++) {
+			if (b) {
+				ret.Add (getRandomBlockStart ());
+			} else {
+				ret.Add (getRandomBlock ());
+			}
+		}
+		return ret;	
+	}
+	
+	private bool getFromBest ()
+	{
+		return Random.value > 0.25;
+	}
+	
+	private bool getFromPair ()
+	{
+		return Random.value > 0.25;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

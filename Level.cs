@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class Level 
 {
 
-	private ArrayList lineList = new ArrayList ();
-	private ArrayList collumList = new ArrayList ();
-	private ArrayList enemyPos = new ArrayList ();
+	private List<int[]> lineList = new List<int[]> ();
+	private List<int[]> collumList = new List<int[]> ();
+	private List<int[]> enemyPos = new List<int[]> ();
 	private int[] playerPos = new int[2];
 	private int[] finishPos= new int[2];
 	private float score = 0;
@@ -15,7 +16,7 @@ public class Level
 	public Level(){
 	}
 
-	public void setLines(ArrayList linePositions,ArrayList collumPositions){
+	public void setLines(List<int[]> linePositions,List<int[]> collumPositions){
 		lineList = linePositions;
 		collumList = collumPositions;
 	}
@@ -24,14 +25,14 @@ public class Level
 		playerPos = pP;
 		finishPos = pF;
 	}
-	public ArrayList getLine(){
+	public List<int[]> getLine(){
 		return lineList;
 	}
 
-	public ArrayList getCollum(){
+	public List<int[]> getCollum(){
 		return collumList;
 	}
-	public ArrayList getEnemies(){
+	public List<int[]> getEnemies(){
 		return enemyPos;
 	}
 	public int[] getPlayerPos (){
@@ -40,7 +41,7 @@ public class Level
 	public int[] getFinishPos (){
 		return finishPos;
 	}
-	public void setEnemies(ArrayList eL){
+	public void setEnemies(List<int[]> eL){
 		enemyPos = eL;
 	}
 	public void positiveEvaluation(){
