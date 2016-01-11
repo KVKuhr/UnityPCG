@@ -305,7 +305,8 @@ public class NewPCG : MonoBehaviour
 	
 	private bool startDijkstra ()
 	{
-		
+		visited.Clear();
+		toVisit.Clear ();
 		
 		toVisit.Add (new Vector2 (player.transform.position.x, player.transform.position.y));
 		
@@ -314,7 +315,6 @@ public class NewPCG : MonoBehaviour
 			
 			Vector2 aux = (Vector2)toVisit [findClosest ()];
 			if (fillAdjacent (aux)) {
-				toVisit.Clear ();
 				return true;
 			}
 		}

@@ -45,11 +45,7 @@ public class Player : MonoBehaviour
 	[SerializeField]
 	private GameObject
 		shield;
-
-
-
 	private CustomUI gui;
-
 
 	void Start ()
 	{
@@ -61,12 +57,12 @@ public class Player : MonoBehaviour
 
 		GameObject holder = GameObject.FindWithTag ("UI");
 
-		if(holder != null)
-		gui = holder.GetComponent<CustomUI>();
+		if (holder != null)
+			gui = holder.GetComponent<CustomUI> ();
 
 		if (gui != null) {
 			gui.startUp (hp);
-		}else
+		} else
 			Debug.Log ("UI not Found");
 	
 	}
@@ -116,7 +112,7 @@ public class Player : MonoBehaviour
 	private void HandleInput ()
 	{
 		if (Input.GetAxis ("Cancel") == 1) {		
-			gui.escPressed();
+			gui.escPressed ();
 		}
 
 		//When the Jump Axis is beeing pressed during update.
@@ -165,6 +161,7 @@ public class Player : MonoBehaviour
 	//Called when a TriggerBoxCollider is touched.
 	void OnTriggerEnter2D (Collider2D other)
 	{		
+
 		string otherTag = other.tag;
 	
 		if (otherTag.Equals ("EnemyProjectile")) {
@@ -188,7 +185,7 @@ public class Player : MonoBehaviour
 	private void gotHit ()
 	{
 		hp--;
-		gui.gotHit();
+		gui.gotHit ();
 		if (hp == 0)
 			Finish (true);
 
@@ -196,17 +193,23 @@ public class Player : MonoBehaviour
 	//Called when the level is reloaded / the next one is loaded.
 	private void Finish (bool reset)
 	{
-		/*
+
 
 	
-		if (reset || Application.loadedLevelName.Equals("ac"))
+		if (reset || Application.loadedLevelName.Equals ("ac"))
 			Application.LoadLevel (Application.loadedLevel);
 		else {
-			if(Application.loadedLevelName.Equals("aa"))
-				Application.LoadLevel("ab");
-			else
-				Application.LoadLevel("aa");		
-		}*/
+			if (Application.loadedLevelName.Equals ("aa"))
+				Application.LoadLevel ("ab");
+			else {
+				if(Application.loadedLevelName.Equals ("ab"))
+				Application.LoadLevel ("aa");
+
+				if (Application.loadedLevelName.Equals ("ad")){
+					gui.openEvaluate();
+				}
+			}
+		}
 	}
 
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class PCGControler : MonoBehaviour
 {
 
-
+	private string errorMsg = "";
 	private PCGLevelMaker pcg;
 	private List<Level> levelList;
 	public static Level sentLevel;
@@ -14,6 +14,8 @@ public class PCGControler : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		levelList = new List<Level> ();
+
 		GameObject.DontDestroyOnLoad (gameObject);
 
 		if (FindObjectsOfType (GetType ()).Length > 1) {
@@ -35,11 +37,20 @@ public class PCGControler : MonoBehaviour
 
 	public void saveLevel ()
 	{
-		lowerAll ();
-		levelList.RemoveAt (getLowestRated ());
-		levelList.Add (sentLevel);
+		if (levelList.Contains(sentLevel) && sentLevel != null) {
+			int index = levelList.IndexOf(sentLevel);
+			levelList.RemoveAt(index);
+			levelList.Insert(index,sentLevel);
+		}
+
+
 		SaveLoad.savedLevels = levelList;
 		SaveLoad.Save ();
+	}
+
+	private void removeLevel (int n)
+	{
+		levelList.RemoveAt (n);
 	}
 
 	private int getLowestRated ()
@@ -47,10 +58,12 @@ public class PCGControler : MonoBehaviour
 		float l = Mathf.Infinity;
 		int returning = 0;
 		for (int i = 0; i<levelList.Count; i++) {
-			if (l > levelList [i].getScore ()) {
-				l = levelList [i].getScore ();
-				returning = i;
-			}				
+			if (levelList [i].isPlayed ()) {
+				if (l > levelList [i].getApproval ()) {
+					l = levelList [i].getApproval ();
+					returning = i;
+				}
+			}
 		}
 		return returning;
 	}
@@ -60,10 +73,27 @@ public class PCGControler : MonoBehaviour
 		float l = -Mathf.Infinity;
 		int returning = 0;
 		for (int i = 0; i<levelList.Count; i++) {
-			if (l < levelList [i].getScore ()) {
-				l = levelList [i].getScore ();
-				returning = i;
-			}				
+			if (levelList [i].isPlayed ()) {
+				if (l < levelList [i].getApproval ()) {
+					l = levelList [i].getApproval ();
+					returning = i;
+				}
+			}
+		}
+		return returning;
+	}
+
+	private int getSecondHighestRated (int first)
+	{
+		float l = -Mathf.Infinity;
+		int returning = 0;
+		for (int i = 0; i<levelList.Count; i++) {
+			if (levelList [i].isPlayed () && i != first) {
+				if (l < levelList [i].getApproval ()) {
+					l = levelList [i].getApproval ();
+					returning = i;
+				}
+			}
 		}
 		return returning;
 	}
@@ -79,35 +109,55 @@ public class PCGControler : MonoBehaviour
 		Application.LoadLevel ("aa");
 	}
 	
-	public void startPCGSeed ()
+	public void startPCGSeed (int l)
 	{
 		SaveLoad.Load ();
 		levelList = SaveLoad.savedLevels;
-
-		int l = getHighestRated ();
-
+		levelList [l].wasPlayed ();
 		sentLevel = levelList [l];
+		saveLevel ();
 		Application.LoadLevel ("ad");
+
 	}
 
-	private void lowerAll ()
-	{
-		foreach (Level l in levelList) 
-			l.negativeEvaluation ();		
-	}
 
 	//TODO
-	private void generateNew ()
+	private void generateNewManual (int l1, int l2, int remove)
 	{
 
+		sentLevel = null;
+
+		Level newest = pcg.createNew (levelList [l1], levelList [l2]);
+		int counting = 100;
+		while (newest == null && counting > 0) {
+			newest = pcg.createNew (levelList [l1], levelList [l2]);
+			counting--;
+		}
+		if (newest != null) {
+			levelList.Add (newest);
+			setError ("...Done!");
+		} else
+			setError ("...Fail! Invalid Combo?");
+
+		removeLevel (remove);
+
+		saveLevel ();
 	
 	}
 
+	private void generateNewAuto ()
+	{
+		int l1 = getHighestRated ();
+		int l2 = getSecondHighestRated (l1);
+		int remove = getLowestRated ();
+					
+		generateNewManual (l1, l2, remove);
+
+	}
 
 	public void makeList ()
 	{
 		levelList = pcg.createNewList (5);
-		Debug.Log (levelList.Count);
 		SaveLoad.savedLevels = levelList;
 		SaveLoad.Save ();
 	}
@@ -116,22 +166,51 @@ public class PCGControler : MonoBehaviour
 	{
 		sentLevel.positiveEvaluation ();
 		saveLevel ();
-
 	
 	}
 
-	private int getOther(int n){
-		while(true){
-			int i = Mathf.FloorToInt(Random.Range(0,levelList.Count-1));
-			if(i!=n)
-				return i;
-		}
+	public void dislikeLevel ()
+	{
+		sentLevel.negativeEvaluation ();
+		saveLevel ();
 	}
 
+	private void setError (string error)
+	{
+		errorMsg = error;
+	}
+
+	public string getError ()
+	{
+		return errorMsg;
+	}
+
+	public void createNew (int l1, int l2, int remove,bool manual)
+	{
+		if(manual)
+		generateNewManual (l1, l2, remove);
+		else
+			generateNewAuto ();
+
+	}
+
+	public string getStat (int x)
+	{
+		return levelList [x].getPlayed()+" / "+levelList [x].getApproval()*100+"%";
+	}
+	public bool isListEmpty(){
+		loadLevels ();
+		if (levelList.Count != 0)
+			return false;
+		return true;
+	}
+
+	/*
+ 			Falta no savelevel o sentlevel voltar pra lista. Feito isso, deve funfa susesegado tudo.
 
 
 
-
+	 */
 
 
 

@@ -29,6 +29,7 @@ public class CustomUI : MonoBehaviour {
 		control = GameObject.FindGameObjectWithTag ("ControlHolder").GetComponent<PCGControler>();
 
 		pauseMenu.enabled = false;
+		evaluateCanvas.enabled = false;
 		maxHealth = max;
 		currentHealth = max;
 		updateText ();
@@ -68,16 +69,23 @@ public class CustomUI : MonoBehaviour {
 			else
 				openPause();
 	}
+	public void openEvaluate(){
+		Time.timeScale = 0.0f;
+		evaluateCanvas.enabled = true;
+	}
+
 
 	public void dislikeLevel(){
 
+		control.dislikeLevel ();
+		exitPress ();
 
 	}
 
 	public void likeLevel(){
 
-
-
+		control.likeLevel ();
+		exitPress ();
 	}
 
 

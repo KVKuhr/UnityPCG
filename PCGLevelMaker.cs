@@ -60,7 +60,7 @@ public class PCGLevelMaker : MonoBehaviour
 	//Level for Loading
 	private Level currentLevel;
 		
-	private void createLevel ()
+	private bool createLevel ()
 	{
 		//Calls the function that oversees terrain creation. Generator V2.
 		createTerrain ();
@@ -68,8 +68,8 @@ public class PCGLevelMaker : MonoBehaviour
 		createEntities (true);
 			
 		if (!makeUsable ())
-			createLevel ();
-
+			return false;
+		return true;
 	}	
 		
 
@@ -295,7 +295,6 @@ public class PCGLevelMaker : MonoBehaviour
 	//End of V3
 	private void remakePositions ()
 	{
-
 		clearPlayerFinish ();
 		clearEnemies ();
 		createEntities (true);	
@@ -340,6 +339,7 @@ public class PCGLevelMaker : MonoBehaviour
 				
 			Vector2 aux = (Vector2)toVisit [findClosest ()];
 			if (fillAdjacent (aux)) {
+				visited.Clear();
 				toVisit.Clear ();
 				return true;
 			}
@@ -598,8 +598,14 @@ public class PCGLevelMaker : MonoBehaviour
 					
 		List<Level> returning = new  List<Level> ();
 			
-		for (int i = 0; i<size; i++) {
-			returning.Add (createAndTest ());			
+		for (int i = 0; returning.Count < size; i++) {
+			returning.Add (createAndTest ());		
+			if(returning[i] == null)
+			{
+				returning.RemoveAt(i);
+				i--;
+			}
+
 		}
 			
 		return returning;	
@@ -607,12 +613,17 @@ public class PCGLevelMaker : MonoBehaviour
 		
 	private Level createAndTest ()
 	{
-		createLevel ();
-		Level returning = currentLevel;
-		currentLevel = null;
-		clearAll ();
-		return returning;
-			
+
+		if (createLevel ()) {
+			Level returning = currentLevel;
+			currentLevel = null;
+			clearAll ();
+			return returning;
+		} 
+
+       currentLevel = null;
+	   clearAll ();
+			return null;
 	}
 
 	public Level createNew (Level best, Level pair)
@@ -652,10 +663,6 @@ public class PCGLevelMaker : MonoBehaviour
 		le.AddRange (getNPositions (best.getEnemies (), bestEnemiesNumber));
 		le.AddRange (getNPositions (pair.getEnemies (), pairEnemiesNumber));
 		le.AddRange (getNPositonsRandom(randomEnemiesNumber,false));
-
-
-
-
 
 
 		if (getFromBest ()) {			 
